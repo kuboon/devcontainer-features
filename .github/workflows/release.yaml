@@ -10,7 +10,7 @@ jobs:
       packages: write
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: "Publish"
         uses: devcontainers/action@v1
@@ -20,3 +20,4 @@ jobs:
           features-namespace: "kuboon/devcontainer-features"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
