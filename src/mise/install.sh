@@ -3,22 +3,7 @@ set -e
 
 MISE_CLI_INSTALLER_GPG_KEY="0x7413A06D"
 
-# Feature options
-if [ ! "$VERSION" = "latest" ]; then
-    export MISE_VERSION="$VERSION"
-fi
-if [ "$INSTALL" = "true" ]; then
-    TRUST="true"
-fi
-# mise installer options
-export MISE_INSTALL_PATH="${INSTALLPATH:-/usr/local/bin/mise}"
-MISE_INSTALL_PATH=$(echo "$MISE_INSTALL_PATH" | sed 's#{CONTAINER_USER_HOME}#'$_CONTAINER_USER_HOME'#g')
-MISE_INSTALL_PATH=$(echo "$MISE_INSTALL_PATH" | sed 's#{REMOTE_USER_HOME}#'$_REMOTE_USER_HOME'#g')
-
-if [ "$(id -u)" -ne 0 ]; then
-    echo -e 'Script must be run as root. Use sudo, su, or add "USER root" to your Dockerfile before running this script.'
-    exit 1
-fi
+export MISE_INSTALL_PATH="${_REMOTE_USER_HOME}/.local/bin/mise"
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -169,32 +154,27 @@ curl -s https://mise.jdx.dev/install.sh.sig | gpg --decrypt | sh
 chmod +x ${MISE_INSTALL_PATH}
 chown "${_REMOTE_USER}:$(id -gn ${_REMOTE_USER} 2>/dev/null || echo ${_REMOTE_USER})" "${MISE_INSTALL_PATH}"
 
-install_mise_activate bash /etc/bash.bashrc
-install_mise_activate zsh /etc/zsh/zshrc
+install_mise_activate bash ${_REMOTE_USER_HOME}/.bashrc
+install_mise_activate zsh ${_REMOTE_USER_HOME}/.zshrc
+install_mise_activate fish ${_REMOTE_USER_HOME}/.config/fish/config.fish
+
+if [ -n "$GLOBAL" ]; then
+    ${MISE_INSTALL_PATH} use -g $GLOBAL
+fi
 
 # Setup postCreateCommand for mise
 mkdir -p /usr/local/share/mise-feature
 
 post_create_file="/usr/local/share/mise-feature/post-create.sh"
-echo "#!/bin/sh" > $post_create_file
 
-if [ "${TRUST}" = "true" ]; then
-    echo "Setting up postCreateCommand for 'mise trust'..."
-    cat << 'EOF' >> $post_create_file
+echo "Setting up postCreateCommand for 'mise trust'..."
+cat << 'EOF' >> $post_create_file
+#!/bin/sh
 if [ -x "$(command -v mise)" ]; then
-    mise trust --all --yes --verbose
-fi
-EOF
-fi
-
-if [ "${INSTALL}" = "true" ]; then
-    echo "Setting up postCreateCommand for 'mise install'..."
-    cat << 'EOF' >> $post_create_file
-if [ -x "$(command -v mise)" ]; then
+    mise trust --all --verbose
     mise install --yes
 fi
 EOF
-fi
 
 chmod +x $post_create_file
 

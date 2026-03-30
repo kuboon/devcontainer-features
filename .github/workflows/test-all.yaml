@@ -22,7 +22,7 @@ jobs:
           - "mcr.microsoft.com/devcontainers/base:debian"
           - "mcr.microsoft.com/devcontainers/base:noble"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: jdx/mise-action@v2
 
       - name: "Generating tests for '${{ matrix.features }}' against '${{ matrix.baseImage }}'"
@@ -36,7 +36,7 @@ jobs:
         features:
           - "mise"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: jdx/mise-action@v2
 
       - name: "Testing '${{ matrix.features }}' scenarios"
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: jdx/mise-action@v2
 
       - name: "Testing global scenarios"

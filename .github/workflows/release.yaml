@@ -17,6 +17,6 @@ jobs:
         with:
           publish-features: "true"
           base-path-to-features: "./src"
-          features-namespace: "atty303/devcontainer-features"
+          features-namespace: "kuboon/devcontainer-features"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

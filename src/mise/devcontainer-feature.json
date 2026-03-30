@@ -3,35 +3,20 @@
   "id": "mise",
   "version": "1.3.0",
   "description": "Installs the mise CLI",
-  "documentationURL": "https://github.com/atty303/devcontainer-features/tree/main/src/mise",
+  "documentationURL": "https://github.com/kuboon/devcontainer-features/tree/main/src/mise",
   "licenseURL": "https://raw.githubusercontent.com/jdx/mise/refs/heads/main/LICENSE",
   "options": {
-    "version": {
+    "global": {
       "type": "string",
-      "default": "latest",
-      "description": "Install a specific version"
-    },
-    "installPath": {
-      "type": "string",
-      "default": "/usr/local/bin/mise",
-      "description": "Path to install mise. `{REMOTE_USER_HOME}` and `{CONTAINER_USER_HOME}` will be expanded to the user's home directory."
+      "default": "lazygit@latest",
+      "description": "`mise use -g [args]` to install global tools. For example, `deno ruby lazygit lazydocker cargo:cargo-binstall`."
     },
     "activate": {
       "type": "string",
       "proposals": ["none", "path", "shims"],
-      "default": "path",
+      "default": "shims",
       "description": "Select how to activate mise in the system. `none` means no activation, `path` means add to PATH, and `shims` means use shims to activate. Supports bash and zsh."
     },
-    "trust": {
-      "type": "boolean",
-      "default": true,
-      "description": "Automatically run `mise trust` to trust workspace (**WARNING**: `mise.toml` in subdirectories will not be trusted even if this option is enabled)"
-    },
-    "install": {
-      "type": "boolean",
-      "default": true,
-      "description": "Automatically run `mise install` to install workspace tools"
-    }
   },
   "customizations": {
     "jetbrains": {

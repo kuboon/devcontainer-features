@@ -7,7 +7,7 @@ Installs the mise CLI
 
 ```json
 "features": {
-    "ghcr.io/atty303/devcontainer-features/mise:1": {}
+    "ghcr.io/kuboon/devcontainer-features/mise:1": {}
 }
 ```
 
