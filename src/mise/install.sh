@@ -3,13 +3,15 @@ set -e
 
 MISE_CLI_INSTALLER_GPG_KEY="0x7413A06D"
 
+export $_REMOTE_USER="${REMOTE_USER:-vscode}"
+export _REMOTE_USER_HOME="${_REMOTE_USER_HOME:-/home/${_REMOTE_USER}}"
 export MISE_INSTALL_PATH="${_REMOTE_USER_HOME}/.local/bin/mise"
 
 export DEBIAN_FRONTEND=noninteractive
 
 # Get the list of GPG key servers that are reachable
 get_gpg_key_servers() {
-    keyservers="hkp://keyserver.ubuntu.com hkp://keyserver.ubuntu.com:80 hkps://keys.openpgp.org hkp://keyserver.pgp.com"
+    keyservers="hkp://keyserver.ubuntu.com hkp://keyserver.ubuntu.com:80 hkps://keys.openpgp.org"
     urls="http://keyserver.ubuntu.com:11371 http://keyserver.ubuntu.com https://keys.openpgp.org http://keyserver.pgp.com:11371"
 
     curl_args=""
@@ -159,7 +161,7 @@ install_mise_activate zsh ${_REMOTE_USER_HOME}/.zshrc
 install_mise_activate fish ${_REMOTE_USER_HOME}/.config/fish/config.fish
 
 if [ -n "$GLOBAL" ]; then
-    ${MISE_INSTALL_PATH} use -g $GLOBAL
+    su ${_REMOTE_USER} -c "${MISE_INSTALL_PATH} use -g ${GLOBAL}"
 fi
 
 # Setup postCreateCommand for mise
@@ -168,9 +170,10 @@ mkdir -p /usr/local/share/mise-feature
 post_create_file="/usr/local/share/mise-feature/post-create.sh"
 
 echo "Setting up postCreateCommand for 'mise trust'..."
+
 cat << 'EOF' >> $post_create_file
 #!/bin/sh
-if [ -x "$(command -v mise)" ]; then
+if [ -x "$(command -v mise)" ] && [ -f mise.toml ]; then
     mise trust --all --verbose
     mise install --yes
 fi

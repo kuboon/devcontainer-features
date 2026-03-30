@@ -16,7 +16,7 @@
       "proposals": ["none", "path", "shims"],
       "default": "shims",
       "description": "Select how to activate mise in the system. `none` means no activation, `path` means add to PATH, and `shims` means use shims to activate. Supports bash and zsh."
-    },
+    }
   },
   "customizations": {
     "jetbrains": {
