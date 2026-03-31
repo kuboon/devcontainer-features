@@ -1,14 +1,14 @@
 {
-  "name": "mise-en-place",
+  "name": "mise-en-place (use -g support)",
   "id": "mise",
-  "version": "1.3.0",
-  "description": "Installs the mise CLI",
+  "version": "1.4.0",
+  "description": "Installs the mise CLI and use -g support to install global tools.",
   "documentationURL": "https://github.com/kuboon/devcontainer-features/tree/main/src/mise",
   "licenseURL": "https://raw.githubusercontent.com/jdx/mise/refs/heads/main/LICENSE",
   "options": {
     "global": {
       "type": "string",
-      "default": "lazygit@latest",
+      "default": "",
       "description": "`mise use -g [args]` to install global tools. For example, `deno ruby lazygit lazydocker cargo:cargo-binstall`."
     },
     "activate": {
