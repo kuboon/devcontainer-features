@@ -1,9 +1,32 @@
 #!/bin/sh
 set -e
 
-export $_REMOTE_USER="${REMOTE_USER:-vscode}"
+export _REMOTE_USER="${_REMOTE_USER:-vscode}"
 export _REMOTE_USER_HOME="${_REMOTE_USER_HOME:-/home/${_REMOTE_USER}}"
+
 export MISE_INSTALL_PATH="${_REMOTE_USER_HOME}/.local/bin/mise"
+
+# Setup postCreateCommand for mise
+mkdir -p /usr/local/share/mise-feature
+post_create_file="/usr/local/share/mise-feature/post-create.sh"
+echo "Setting up postCreateCommand for 'mise trust'..."
+
+if [ ! -f "$post_create_file" ]; then
+    cat <<EOF >> $post_create_file
+#!/bin/sh
+export MISE_INSTALL_PATH=$MISE_INSTALL_PATH
+if [ -x "\$(command -v mise)" ] && [ -f mise.toml ]; then
+    mise trust --show
+    mise install --yes
+fi
+EOF
+    chmod +x $post_create_file
+fi
+
+if [ -e "$MISE_INSTALL_PATH" ]; then
+    echo "mise installed at $MISE_INSTALL_PATH. Exiting."
+    exit 0
+fi
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -57,6 +80,7 @@ install_dir=$(dirname "$MISE_INSTALL_PATH")
 echo "Installing mise CLI..."
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 24853EC9F655CE80B48E6C3A8B81C9D17413A06D
 curl https://mise.jdx.dev/install.sh.sig | gpg --decrypt | su ${_REMOTE_USER} -c "sh"
+chown $_REMOTE_USER $MISE_INSTALL_PATH
 
 install_mise_activate bash ${_REMOTE_USER_HOME}/.bashrc
 install_mise_activate zsh ${_REMOTE_USER_HOME}/.zshrc
@@ -66,22 +90,6 @@ if [ -n "$GLOBAL" ]; then
     su ${_REMOTE_USER} -c "${MISE_INSTALL_PATH} use -g ${GLOBAL}"
 fi
 
-# Setup postCreateCommand for mise
-mkdir -p /usr/local/share/mise-feature
-
-post_create_file="/usr/local/share/mise-feature/post-create.sh"
-
-echo "Setting up postCreateCommand for 'mise trust'..."
-
-cat << 'EOF' >> $post_create_file
-#!/bin/sh
-if [ -x "$(command -v mise)" ] && [ -f mise.toml ]; then
-    mise trust -a
-    mise install --yes
-fi
-EOF
-
-chmod +x $post_create_file
 
 # Clean up
 rm -rf "/tmp/tmp-gnupg"
